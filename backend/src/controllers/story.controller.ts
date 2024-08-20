@@ -11,8 +11,21 @@ import { handleError } from "../utils/errors";
  * @returns A list of all stories in JSON format
  */
 const getStories = async (req: Request, res: Response) => {
+  const { category, status, title, author } = req.query;
+
   try {
-    const stories = await prisma.story.findMany();
+    const stories = await prisma.story.findMany({
+      where: {
+        ...(category && { category: category as string }),
+        ...(status && { status: status as string }),
+        ...(title && {
+          title: { contains: title as string, mode: "insensitive" },
+        }),
+        ...(author && {
+          author: { contains: author as string, mode: "insensitive" },
+        }),
+      },
+    });
     res.status(200).json({ stories: stories });
   } catch (error) {
     handleError(error, res);
