@@ -3,6 +3,13 @@ import { prisma } from "..";
 import { storySchema } from "../schema/story.schema";
 import { handleError } from "../utils/errors";
 
+/**
+ * Get all stories.
+ *
+ * @param req - Express request object
+ * @param res - Express response object
+ * @returns A list of all stories in JSON format
+ */
 const getStories = async (req: Request, res: Response) => {
   try {
     const stories = await prisma.story.findMany();
@@ -12,6 +19,13 @@ const getStories = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Get a single story by ID.
+ *
+ * @param req - Express request object with story ID in params
+ * @param res - Express response object
+ * @returns The story with the given ID in JSON format or a 404 error if not found
+ */
 const getStory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -32,6 +46,13 @@ const getStory = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Create a new story.
+ *
+ * @param req - Express request object with story data in body
+ * @param res - Express response object
+ * @returns The created story in JSON format or a 400 error if invalid data
+ */
 const createStory = async (req: Request, res: Response) => {
   try {
     const validatedStory = storySchema.parse(req.body);
@@ -46,6 +67,13 @@ const createStory = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Update a story by ID.
+ *
+ * @param req - Express request object with story ID in params and new data in body
+ * @param res - Express response object
+ * @returns The updated story in JSON format or a 400 error if invalid data
+ */
 const updateStory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -64,6 +92,13 @@ const updateStory = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Delete a story by ID.
+ *
+ * @param req - Express request object with story ID in params
+ * @param res - Express response object
+ * @returns A 204 status code if successful or a 404 error if not found
+ */
 const deleteStory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

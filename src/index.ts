@@ -11,10 +11,6 @@ app.use(express.json());
 
 app.use("/stories", StoryRouter);
 
-app.get("/hello-world", (req: Request, res: Response) => {
-  res.send("Hello World");
-});
-
 // Catch unregistered route
 app.get("*", (req: Request, res: Response) => {
   res.status(404).json({
