@@ -9,6 +9,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
+import { Toaster } from "../ui/toaster";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -48,20 +49,21 @@ const MainLayout: FC<MainLayoutProps> = ({ children, breadcrumbs }) => {
       <div className="w-5/6 px-5 py-8">
         <BreadcrumbList className="text-black">
           {breadcrumbs.map((breadcrumb, index) => (
-            <>
-              <BreadcrumbItem key={index}>
+            <div key={index}>
+              <BreadcrumbItem>
                 <BreadcrumbLink
                   href={breadcrumb.href}
                   className="hover:underline"
                 >
                   {breadcrumb.label}
                 </BreadcrumbLink>
+                {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
               </BreadcrumbItem>
-              {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-            </>
+            </div>
           ))}
         </BreadcrumbList>
         <main className="py-6">{children}</main>
+        <Toaster />
       </div>
     </div>
   );

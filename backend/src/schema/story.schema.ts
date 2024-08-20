@@ -5,7 +5,7 @@ export const storySchema = z.object({
   author: z.string().min(1, "Author is required"),
   category: z.string().min(1, "Category is required"),
   tags: z.array(z.string()),
-  status: z.enum(["DRAFT", "PUBLISHED"]),
+  status: z.enum(["Draft", "Published"]),
   synopsis: z.string().min(1, "Synopsis is required"),
   storyCover: z.string().url(),
 });
