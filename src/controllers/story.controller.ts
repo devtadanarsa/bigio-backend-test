@@ -39,7 +39,7 @@ const getStory = async (req: Request, res: Response) => {
     if (!story) {
       res.status(404).json({ error: "Story not found" });
     } else {
-      res.status(200).json({ story: story });
+      res.status(200).json({ story });
     }
   } catch (error) {
     handleError(error, res);

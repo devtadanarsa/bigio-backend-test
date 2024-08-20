@@ -1,12 +1,50 @@
 import { z } from "zod";
 import { Response } from "express";
+import { Prisma } from "@prisma/client";
 
 export const handleError = (error: unknown, res: Response) => {
   if (error instanceof z.ZodError) {
-    res.status(400).json({ errors: error.errors });
+    // Handle Zod validation errors
+    res.status(400).json({
+      status: "error",
+      message: "Validation failed",
+      errors: error.errors.map((e) => e.message),
+    });
+  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    // Handle known Prisma errors
+    switch (error.code) {
+      // Record to delete does not exist
+      case "P2025":
+        res.status(404).json({
+          status: "error",
+          message: "Record not found",
+        });
+        break;
+
+      // Unique constraint failed
+      case "P2002":
+        res.status(409).json({
+          status: "error",
+          message: "Record already exists",
+        });
+        break;
+      default:
+        res.status(400).json({
+          status: "error",
+          message: "Database error",
+        });
+    }
   } else if (error instanceof Error) {
-    res.status(500).json({ error: error.message });
+    // Handle other errors
+    res.status(500).json({
+      status: "error",
+      message: "An unexpected error occurred",
+    });
   } else {
-    res.status(500).json({ error: "An unknown error occurred" });
+    // Handle unknown errors
+    res.status(500).json({
+      status: "error",
+      message: "An unknown error occurred",
+    });
   }
 };
