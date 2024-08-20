@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only --exit-child src/server.ts",
+    "dev": "nodemon src/index.ts",
     "db:migrate": "npx prisma migrate dev --name user-entity --create-only && npx prisma generate",
     "db:push": "npx prisma db push"
   },
@@ -26,6 +27,7 @@
   "dependencies": {
     "@prisma/client": "5.18.0",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.19.2",
+    "zod": "^3.23.8"
   }
 }
