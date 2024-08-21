@@ -32,6 +32,17 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { IoFilterSharp } from "react-icons/io5";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 
 /**
  * StoryListPage Component
@@ -72,6 +83,28 @@ const StoryListPage = () => {
         });
       });
   }, [toast, title, category, status]);
+
+  const handleDelete = (id: number) => {
+    apiClient
+      .delete(`/stories/${id}`)
+      .then(() => {
+        setStories((prevStories) =>
+          prevStories.filter((story) => story.id !== id)
+        );
+        toast({
+          title: "Story deleted successfully",
+          description: "The story has been deleted successfully",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: "Failed to delete story",
+          description: "An error occurred while deleting the story",
+          variant: "destructive",
+        });
+      });
+  };
 
   return (
     <MainLayout
@@ -236,15 +269,39 @@ const StoryListPage = () => {
                       Choose Action <RiArrowDropDownLine className="text-xl" />
                     </div>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>
+                  <DropdownMenuContent className="space-y-2 py-3">
+                    <div className="flex mx-1 items-center text-sm hover:underline">
                       <FiEdit3 />
                       <span className="ml-2">Edit Story</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <BsTrash />
-                      <span className="ml-2">Delete Story</span>
-                    </DropdownMenuItem>
+                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger className="flex mx-1 items-center text-sm text-red-500 hover:underline">
+                        <BsTrash />
+                        <span className="ml-2">Delete Story</span>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your stories and remove your data from our
+                            servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-red-500"
+                            onClick={() => handleDelete(story.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

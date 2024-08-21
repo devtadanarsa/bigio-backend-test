@@ -25,6 +25,9 @@ const getStories = async (req: Request, res: Response) => {
           author: { contains: author as string, mode: "insensitive" },
         }),
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     res.status(200).json({ stories: stories });
   } catch (error) {
@@ -115,6 +118,12 @@ const updateStory = async (req: Request, res: Response) => {
 const deleteStory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    await prisma.chapter.deleteMany({
+      where: {
+        storyId: parseInt(id),
+      },
+    });
 
     await prisma.story.delete({
       where: {
