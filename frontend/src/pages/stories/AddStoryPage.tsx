@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,15 +28,55 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
+import { useChapterStore } from "@/store/chapterStore";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { FaPlus } from "react-icons/fa";
+import dayjs from "dayjs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { FiEdit3 } from "react-icons/fi";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { BsTrash } from "react-icons/bs";
+import { useStoryFormStore } from "@/store/formDataStore";
 
 const AddStoryPage = () => {
-  const [tags, setTags] = useState<string[]>([]);
+  // const [tags, setTags] = useState<string[]>([]);
   const navigate = useNavigate();
+
+  const { toast } = useToast();
+
+  const { chapters, deleteChapter } = useChapterStore();
+  const { formData, setFormData, clearFormData, tags, setTags } =
+    useStoryFormStore();
 
   const [inputValue, setInputValue] = useState<string>("");
 
   const form = useForm<z.infer<typeof storyFormSchema>>({
     resolver: zodResolver(storyFormSchema),
+    defaultValues: formData,
   });
 
   async function onSubmit(values: z.infer<typeof storyFormSchema>) {
@@ -46,9 +86,23 @@ const AddStoryPage = () => {
         storyCover: "https://example.com/image.jpg",
         tags,
       });
+
+      toast({
+        title: "Story added successfully",
+        description: "The story has been added successfully.",
+      });
+
+      clearFormData();
+
       navigate("/stories");
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Fatal error has occurred",
+        description:
+          "The action could not be completed. Please try again later.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -67,6 +121,10 @@ const AddStoryPage = () => {
   const removeTag = (indexToRemove: number) => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
+
+  useEffect(() => {
+    form.reset(formData);
+  }, [formData, form]);
 
   return (
     <MainLayout
@@ -209,8 +267,8 @@ const AddStoryPage = () => {
                       <FormControl>
                         <Input
                           type="file"
-                          {...field}
                           className="cursor-pointer"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -245,16 +303,102 @@ const AddStoryPage = () => {
                 )}
               />
             </div>
-            <div className="flex gap-4 justify-end">
-              <Link to="/stories">
-                <Button className="px-8 py-2" variant="outline">
-                  Cancel
-                </Button>
-              </Link>
-              <Button type="submit" className="px-8 py-2">
-                Save Story
+          </div>
+
+          <div className="mt-8 border px-8 py-6">
+            <h3 className="text-2xl font-medium">Story Chapters</h3>
+            <Link
+              to="/chapters/add"
+              onClick={() => {
+                const { storyCover, ...rest } = form.getValues();
+                setFormData(rest);
+              }}
+            >
+              <Button
+                className="mt-8 flex items-center gap-3"
+                variant="outline"
+              >
+                Add Chapter <FaPlus />
               </Button>
-            </div>
+            </Link>
+            <Table className="mt-2">
+              {chapters.length === 0 && (
+                <TableCaption>You have no chapters.</TableCaption>
+              )}
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {chapters.map((chapter, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{chapter.title}</TableCell>
+                    <TableCell>
+                      {dayjs(Date.now()).format("DD MMMM YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none">
+                          <div className="flex items-center gap-1">
+                            Choose Action{" "}
+                            <RiArrowDropDownLine className="text-xl" />
+                          </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="space-y-2 py-3">
+                          <div className="flex mx-1 items-center text-sm hover:underline">
+                            <FiEdit3 />
+                            <span className="ml-2">Edit Chapter</span>
+                          </div>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger className="flex mx-1 items-center text-sm text-red-500 hover:underline">
+                              <BsTrash />
+                              <span className="ml-2">Delete Chapter</span>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will
+                                  permanently delete your chapter and remove
+                                  your data from our servers.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-500"
+                                  onClick={() => deleteChapter(index)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="flex gap-4 justify-end mt-8">
+            <Link to="/stories">
+              <Button className="px-8 py-2" variant="outline">
+                Cancel
+              </Button>
+            </Link>
+            <Button type="submit" className="px-8 py-2">
+              Save Story
+            </Button>
           </div>
         </form>
       </Form>

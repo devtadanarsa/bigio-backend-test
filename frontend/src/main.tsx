@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage.tsx";
 import StoryListPage from "./pages/stories/StoryListPage.tsx";
 import AddStoryPage from "./pages/stories/AddStoryPage.tsx";
+import AddChapterPage from "./pages/chapters/AddChapterPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/stories/add",
     element: <AddStoryPage />,
+  },
+  {
+    path: "/chapters/add",
+    element: <AddChapterPage />,
   },
 ]);
 

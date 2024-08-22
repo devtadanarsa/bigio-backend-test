@@ -10,3 +10,12 @@ export type Story = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type Chapter = {
+  id?: number;
+  title: string;
+  content: string;
+  storyId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

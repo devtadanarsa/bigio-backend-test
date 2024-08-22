@@ -8,3 +8,8 @@ export const storyFormSchema = z.object({
   storyCover: z.string().url(),
   status: z.enum(["Draft", "Published"]),
 });
+
+export const chapterFormSchema = z.object({
+  title: z.string().min(5).max(100),
+  content: z.string().min(20),
+});
