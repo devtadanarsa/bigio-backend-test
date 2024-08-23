@@ -10,6 +10,7 @@ interface ChapterState {
     | Chapter[];
   addChapter: (chapter: { title: string; content: string }) => void;
   deleteChapter: (index: number) => void;
+  clearChapters: () => void;
 }
 
 export const useChapterStore = create<ChapterState>((set) => ({
@@ -21,4 +22,5 @@ export const useChapterStore = create<ChapterState>((set) => ({
       chapters: state.chapters.filter((_, chapterIdx) => chapterIdx !== index),
     }));
   },
+  clearChapters: () => set({ chapters: [] }),
 }));

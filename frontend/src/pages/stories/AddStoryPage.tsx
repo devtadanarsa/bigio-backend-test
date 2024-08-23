@@ -1,83 +1,43 @@
 import MainLayout from "@/components/layouts/MainLayout";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
-import { IoIosClose } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { storyFormSchema } from "@/lib/form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { useChapterStore } from "@/store/chapterStore";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { FaPlus } from "react-icons/fa";
-import dayjs from "dayjs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { RiArrowDropDownLine } from "react-icons/ri";
-import { FiEdit3 } from "react-icons/fi";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { BsTrash } from "react-icons/bs";
 import { useStoryFormStore } from "@/store/formDataStore";
+import ChapterList from "@/components/organisms/ChapterList";
+import FormFieldWrapper from "@/components/molecules/FormFieldWrapper";
+import TagInputField from "@/components/molecules/TagInputField";
 
 const AddStoryPage = () => {
+  // React router hook to navigate between pages
   const navigate = useNavigate();
 
+  // Shadcnui hook to display toast messages
   const { toast } = useToast();
 
-  const { chapters, deleteChapter } = useChapterStore();
+  // Custom hooks to manage the state of the story form
+  const { chapters, clearChapters } = useChapterStore();
   const { formData, setFormData, clearFormData, tags, setTags } =
     useStoryFormStore();
 
+  // Local state to manage tags input
   const [inputValue, setInputValue] = useState<string>("");
 
+  // React hook form hook to manage form state
   const form = useForm<z.infer<typeof storyFormSchema>>({
     resolver: zodResolver(storyFormSchema),
     defaultValues: formData,
   });
 
+  // Handle form submission
   async function onSubmit(values: z.infer<typeof storyFormSchema>) {
     try {
       await apiClient.post("/stories", {
@@ -95,6 +55,7 @@ const AddStoryPage = () => {
       });
 
       clearFormData();
+      clearChapters();
 
       navigate("/stories");
     } catch (error) {
@@ -125,6 +86,7 @@ const AddStoryPage = () => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
+  // Reset the form when the formData changes
   useEffect(() => {
     form.reset(formData);
   }, [formData, form]);
@@ -144,170 +106,78 @@ const AddStoryPage = () => {
           <div className="space-y-8 px-8 py-6 shadow-md border mt-6">
             {/* Title and Writer Name Input */}
             <div className="flex gap-8">
-              <FormField
-                control={form.control}
+              <FormFieldWrapper
                 name="title"
-                render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter the title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
+                label="Story Title"
+                placeholder="Enter the title"
                 control={form.control}
+                className="w-1/2"
+              />
+
+              <FormFieldWrapper
                 name="author"
-                render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <FormLabel>Writer Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter the writer name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Writer Name"
+                placeholder="Enter the author name"
+                control={form.control}
+                className="w-1/2"
               />
             </div>
 
             {/* Synopsis Textarea */}
-            <FormField
-              control={form.control}
+            <FormFieldWrapper
               name="synopsis"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Synopsis</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter story synopsis..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Synopsis of the Story"
+              placeholder="Enter story synopsis..."
+              control={form.control}
+              componentType="textarea"
             />
 
             {/* Category and Tags Input */}
             <div className="flex gap-8">
-              <div className="w-1/2 space-y-1">
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectItem value="Financial">
-                                Financial
-                              </SelectItem>
-                              <SelectItem value="Technology">
-                                Technology
-                              </SelectItem>
-                              <SelectItem value="Health">Health</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="w-1/2 space-y-1">
-                <Label htmlFor="tags">
-                  Tags -{" "}
-                  <span className="text-muted-foreground">
-                    Press Enter to add tags
-                  </span>
-                </Label>
-                <Input
-                  type="text"
-                  id="author"
-                  placeholder="Enter the tags"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <div className="flex items-center gap-3">
-                  {/* <p>Required</p> */}
-                  {tags.map((tag, index) => (
-                    <Badge
-                      key={`Tag - ${index}`}
-                      className="rounded-sm flex items-center gap-1 w-fit mt-2"
-                    >
-                      {tag}{" "}
-                      <IoIosClose
-                        className="text-lg cursor-pointer"
-                        onClick={() => removeTag(index)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <FormFieldWrapper
+                name="category"
+                label="Category"
+                placeholder="Select category"
+                control={form.control}
+                componentType="select"
+                className="w-1/2"
+                selectOptions={["Financial", "Technology", "Health"]}
+              />
+
+              <TagInputField
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                handleKeyDown={handleKeyDown}
+                tags={tags}
+                removeTag={removeTag}
+                className="w-1/2 space-y-2"
+              />
             </div>
 
             {/* Title and Writer Name Input */}
             <div className="flex gap-8">
-              <div className="w-1/2 space-y-1">
-                <FormField
-                  control={form.control}
-                  name="storyCover"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cover Image</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          className="cursor-pointer"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
+              <FormFieldWrapper
+                name="storyCover"
+                label="Cover Image"
                 control={form.control}
+                placeholder="Select cover image"
+                componentType="file"
+                className="w-1/2"
+              />
+
+              <FormFieldWrapper
                 name="status"
-                render={({ field }) => (
-                  <FormItem className="w-1/2">
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="Published">Publised</SelectItem>
-                            <SelectItem value="Draft">Draft</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Status"
+                placeholder="Enter the status"
+                componentType="select"
+                selectOptions={["Published", "Draft"]}
+                control={form.control}
+                className="w-1/2"
               />
             </div>
           </div>
 
+          {/* Story Chapters */}
           <div className="mt-8 border px-8 py-6">
             <h3 className="text-2xl font-medium">Story Chapters</h3>
             <Link
@@ -324,75 +194,11 @@ const AddStoryPage = () => {
                 Add Chapter <FaPlus />
               </Button>
             </Link>
-            <Table className="mt-2">
-              {chapters.length === 0 && (
-                <TableCaption>You have no chapters.</TableCaption>
-              )}
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
 
-              <TableBody>
-                {chapters.map((chapter, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{chapter.title}</TableCell>
-                    <TableCell>
-                      {dayjs(Date.now()).format("DD MMMM YYYY")}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="outline-none">
-                          <div className="flex items-center gap-1">
-                            Choose Action{" "}
-                            <RiArrowDropDownLine className="text-xl" />
-                          </div>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="space-y-2 py-3">
-                          <div className="flex mx-1 items-center text-sm hover:underline">
-                            <FiEdit3 />
-                            <span className="ml-2">Edit Chapter</span>
-                          </div>
-
-                          <AlertDialog>
-                            <AlertDialogTrigger className="flex mx-1 items-center text-sm text-red-500 hover:underline">
-                              <BsTrash />
-                              <span className="ml-2">Delete Chapter</span>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete your chapter and remove
-                                  your data from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-500"
-                                  onClick={() => deleteChapter(index)}
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <ChapterList chapters={chapters} />
           </div>
 
+          {/* Action Buttons */}
           <div className="flex gap-4 justify-end mt-8">
             <Link to="/stories">
               <Button className="px-8 py-2" variant="outline">
