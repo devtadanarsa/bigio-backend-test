@@ -67,8 +67,8 @@ const createChapter = async (req: Request, res: Response) => {
   try {
     const chapter = await prisma.chapter.create({
       data: {
-        title: validatedContent.title,
-        content: validatedContent.content,
+        title: validatedContent[0].title,
+        content: validatedContent[0].content,
         storyId: parseInt(storyId),
       },
     });
@@ -97,8 +97,8 @@ const updateChapter = async (req: Request, res: Response) => {
         id: parseInt(chapterId),
       },
       data: {
-        title: validatedContent.title,
-        content: validatedContent.content,
+        title: validatedContent[0].title,
+        content: validatedContent[0].content,
       },
     });
     res.status(200).json({ chapter });

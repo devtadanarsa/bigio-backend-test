@@ -63,7 +63,6 @@ import { BsTrash } from "react-icons/bs";
 import { useStoryFormStore } from "@/store/formDataStore";
 
 const AddStoryPage = () => {
-  // const [tags, setTags] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const { toast } = useToast();
@@ -82,9 +81,12 @@ const AddStoryPage = () => {
   async function onSubmit(values: z.infer<typeof storyFormSchema>) {
     try {
       await apiClient.post("/stories", {
-        ...values,
-        storyCover: "https://example.com/image.jpg",
-        tags,
+        story: {
+          ...values,
+          storyCover: "https://example.com/image.jpg",
+          tags,
+        },
+        chapters,
       });
 
       toast({
@@ -96,6 +98,7 @@ const AddStoryPage = () => {
 
       navigate("/stories");
     } catch (error) {
+      console.log(error);
       console.error(error);
       toast({
         title: "Fatal error has occurred",

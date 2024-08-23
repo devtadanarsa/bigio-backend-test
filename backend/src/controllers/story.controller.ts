@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "..";
 import { storySchema } from "../schema/story.schema";
 import { handleError } from "../utils/errors";
+import { chapterSchema } from "../schema/chapter.schema";
 
 /**
  * Get all stories.
@@ -50,6 +51,9 @@ const getStory = async (req: Request, res: Response) => {
       where: {
         id: parseInt(id),
       },
+      include: {
+        chapters: true,
+      },
     });
 
     if (!story) {
@@ -71,13 +75,23 @@ const getStory = async (req: Request, res: Response) => {
  */
 const createStory = async (req: Request, res: Response) => {
   try {
-    const validatedStory = storySchema.parse(req.body);
+    const { story, chapters } = req.body;
+
+    const validatedStory = storySchema.parse(story);
+    const validatedChapters = chapterSchema.parse(chapters);
 
     const newStory = await prisma.story.create({
       data: validatedStory,
     });
 
-    res.status(201).json({ story: newStory });
+    const newChapters = await prisma.chapter.createMany({
+      data: validatedChapters.map((chapter) => ({
+        ...chapter,
+        storyId: newStory.id,
+      })),
+    });
+
+    res.status(201).json({ story: { ...story, chapter: newChapters } });
   } catch (error) {
     handleError(error, res);
   }
