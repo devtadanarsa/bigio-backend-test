@@ -22,6 +22,7 @@ interface FormFieldWrapperProps {
   label: string;
   placeholder: string;
   control: any;
+  defaultValue?: string;
   componentType?: "input" | "textarea" | "select" | "file";
   selectOptions?: string[];
   className?: string;
@@ -32,6 +33,7 @@ const FormFieldWrapper: FC<FormFieldWrapperProps> = ({
   label,
   placeholder,
   control,
+  defaultValue,
   componentType = "input",
   selectOptions = [],
   className = "",
@@ -39,10 +41,16 @@ const FormFieldWrapper: FC<FormFieldWrapperProps> = ({
   const renderControl = (field) => {
     switch (componentType) {
       case "textarea":
-        return <Textarea placeholder={placeholder} {...field} />;
+        return (
+          <Textarea
+            placeholder={placeholder}
+            {...field}
+            defaultValue={defaultValue}
+          />
+        );
       case "select":
         return (
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select onValueChange={field.onChange} value={defaultValue}>
             <SelectTrigger>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
@@ -69,6 +77,7 @@ const FormFieldWrapper: FC<FormFieldWrapperProps> = ({
     <FormField
       control={control}
       name={name}
+      defaultValue={defaultValue}
       render={({ field }) => (
         <FormItem className={className}>
           <FormLabel>{label}</FormLabel>

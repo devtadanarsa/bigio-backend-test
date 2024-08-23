@@ -51,15 +51,12 @@ const getStory = async (req: Request, res: Response) => {
       where: {
         id: parseInt(id),
       },
-      include: {
-        chapters: true,
-      },
     });
 
     if (!story) {
       res.status(404).json({ error: "Story not found" });
     } else {
-      res.status(200).json({ story });
+      res.status(200).json(story);
     }
   } catch (error) {
     handleError(error, res);
