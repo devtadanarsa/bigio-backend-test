@@ -18,10 +18,19 @@ import { ClassicEditor, Bold, Essentials, Italic, Paragraph } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";
 import { useChapterStore } from "@/store/chapterStore";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { useToast } from "@/components/ui/use-toast";
+import { apiClient } from "@/lib/utils";
 
 const AddChapterPage = () => {
+  const [searchParams] = useSearchParams();
+
+  const { toast } = useToast();
+
+  const isEditPage = searchParams.get("isEditPage");
+  const storyId = parseInt(searchParams.get("storyId") ?? "");
+
   const form = useForm<z.infer<typeof chapterFormSchema>>({
     resolver: zodResolver(chapterFormSchema),
   });
@@ -29,9 +38,27 @@ const AddChapterPage = () => {
   const addChapter = useChapterStore((state) => state.addChapter);
   const navigate = useNavigate();
 
-  function onSubmit(values: z.infer<typeof chapterFormSchema>) {
-    addChapter(values);
-    navigate("/stories/add");
+  async function onSubmit(values: z.infer<typeof chapterFormSchema>) {
+    if (isEditPage) {
+      try {
+        await apiClient.post(`/stories/${storyId}/chapters`, values);
+        toast({
+          title: "Chapter added successfully",
+          description: "The chapter has been added successfully.",
+        });
+        navigate(`/stories/${storyId}/edit`);
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "An error occurred",
+          description: "An error occurred while adding the chapter.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      addChapter(values);
+      navigate("/stories/add");
+    }
   }
 
   return (

@@ -83,10 +83,10 @@ const EditStoryPage = () => {
       breadcrumbs={[
         { label: "Home", href: "/" },
         { label: "Story Management", href: "/stories" },
-        { label: "Edit Story", href: `/stories/${storyId}/add` },
+        { label: "Edit Story", href: `/stories/${storyId}/edit` },
       ]}
     >
-      <h1 className="text-3xl font-semibold">Add New Story</h1>
+      <h1 className="text-3xl font-semibold">Edit Story</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -170,7 +170,7 @@ const EditStoryPage = () => {
           <div className="mt-8 border px-8 py-6">
             <h3 className="text-2xl font-medium">Story Chapters</h3>
             <Link
-              to="/chapters/add"
+              to={`/chapters/add?isEditPage=true&storyId=${storyId}`}
               onClick={() => {
                 const { storyCover, ...rest } = form.getValues();
                 setFormData(rest);
@@ -180,11 +180,12 @@ const EditStoryPage = () => {
                 className="mt-8 flex items-center gap-3"
                 variant="outline"
               >
-                Add Chapter <FaPlus />
+                Add Chapter
+                <FaPlus />
               </Button>
             </Link>
 
-            {chapters && <ChapterList chapters={chapters} />}
+            {chapters && <ChapterList chapters={chapters} isEditPage />}
           </div>
 
           {/* Action Buttons */}

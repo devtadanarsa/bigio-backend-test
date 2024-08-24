@@ -29,16 +29,44 @@ import {
 } from "../ui/alert-dialog";
 import { BsTrash } from "react-icons/bs";
 import { useChapterStore } from "@/store/chapterStore";
+import axios from "axios";
+import { Chapter } from "@/lib/types";
+import { useToast } from "../ui/use-toast";
 
 interface ChapterListProps {
-  chapters: {
-    title: string;
-    content: string;
-  }[];
+  chapters:
+    | {
+        title: string;
+        content: string;
+      }[]
+    | Chapter[];
+  isEditPage?: boolean;
 }
 
-const ChapterList: FC<ChapterListProps> = ({ chapters }) => {
+const ChapterList: FC<ChapterListProps> = ({
+  chapters,
+  isEditPage = false,
+}) => {
   const { deleteChapter } = useChapterStore();
+
+  const { toast } = useToast();
+
+  const handleDeleteChapter = async (chapter: Chapter) => {
+    try {
+      await axios.delete(`/stories/${chapter.storyId}/chapters/${chapter.id}`);
+      toast({
+        title: "Chapter deleted successfully",
+        description: "The chapter has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "An error occurred",
+        description: "An error occurred while deleting the chapter.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Table className="mt-2">
@@ -57,7 +85,11 @@ const ChapterList: FC<ChapterListProps> = ({ chapters }) => {
         {chapters.map((chapter, index) => (
           <TableRow key={index}>
             <TableCell>{chapter.title}</TableCell>
-            <TableCell>{dayjs(Date.now()).format("DD MMMM YYYY")}</TableCell>
+            <TableCell>
+              {isEditPage
+                ? dayjs((chapter as Chapter).updatedAt).format("DD MMMM YYYY")
+                : dayjs(Date.now()).format("DD MMMM YYYY")}
+            </TableCell>
             <TableCell>
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none">
@@ -89,12 +121,23 @@ const ChapterList: FC<ChapterListProps> = ({ chapters }) => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-500"
-                          onClick={() => deleteChapter(index)}
-                        >
-                          Delete
-                        </AlertDialogAction>
+                        {isEditPage ? (
+                          <AlertDialogAction
+                            className="bg-red-500"
+                            onClick={() =>
+                              handleDeleteChapter(chapter as Chapter)
+                            }
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        ) : (
+                          <AlertDialogAction
+                            className="bg-red-500"
+                            onClick={() => deleteChapter(index)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        )}
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

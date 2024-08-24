@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "..";
 import { handleError } from "../utils/errors";
-import { chapterSchema } from "../schema/chapter.schema";
+import { chapterSchema, oneChapterSchema } from "../schema/chapter.schema";
 
 /**
  * @route GET /stories/:storyId/chapters
@@ -62,13 +62,13 @@ const getChapter = async (req: Request, res: Response) => {
 const createChapter = async (req: Request, res: Response) => {
   const { storyId } = req.params;
 
-  const validatedContent = chapterSchema.parse(req.body);
+  const validatedContent = oneChapterSchema.parse(req.body);
 
   try {
     const chapter = await prisma.chapter.create({
       data: {
-        title: validatedContent[0].title,
-        content: validatedContent[0].content,
+        title: validatedContent.title,
+        content: validatedContent.content,
         storyId: parseInt(storyId),
       },
     });

@@ -270,10 +270,13 @@ const StoryListPage = () => {
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="space-y-2 py-3">
-                    <div className="flex mx-1 items-center text-sm hover:underline">
+                    <Link
+                      to={`/stories/${story.id}/edit`}
+                      className="flex mx-1 items-center text-sm hover:underline"
+                    >
                       <FiEdit3 />
                       <span className="ml-2">Edit Story</span>
-                    </div>
+                    </Link>
 
                     <AlertDialog>
                       <AlertDialogTrigger className="flex mx-1 items-center text-sm text-red-500 hover:underline">
