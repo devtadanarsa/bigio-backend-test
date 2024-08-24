@@ -21,8 +21,7 @@ const EditStoryPage = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
 
-  const { formData, setFormData, clearFormData, tags, setTags } =
-    useStoryFormStore();
+  const { tags, setTags } = useStoryFormStore();
 
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -169,13 +168,7 @@ const EditStoryPage = () => {
           {/* Story Chapters */}
           <div className="mt-8 border px-8 py-6">
             <h3 className="text-2xl font-medium">Story Chapters</h3>
-            <Link
-              to={`/chapters/add?isEditPage=true&storyId=${storyId}`}
-              onClick={() => {
-                const { storyCover, ...rest } = form.getValues();
-                setFormData(rest);
-              }}
-            >
+            <Link to={`/chapters/add?isEditPage=true&storyId=${storyId}`}>
               <Button
                 className="mt-8 flex items-center gap-3"
                 variant="outline"

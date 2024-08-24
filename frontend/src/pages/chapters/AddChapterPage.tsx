@@ -71,7 +71,9 @@ const AddChapterPage = () => {
       ]}
     >
       <div className="flex items-center gap-3">
-        <Link to="/stories/add">
+        <Link
+          to={`${isEditPage ? `/stories/${storyId}/edit` : "/stories/add"}`}
+        >
           <IoMdArrowRoundBack className="text-3xl" />
         </Link>
         <h1 className="text-3xl font-semibold">Add Chapter</h1>

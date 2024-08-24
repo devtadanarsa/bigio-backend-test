@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { ClassicEditor, Bold, Essentials, Italic, Paragraph } from "ckeditor5";
 
 interface FormFieldWrapperProps {
   name: string;
@@ -23,7 +25,7 @@ interface FormFieldWrapperProps {
   placeholder: string;
   control: any;
   defaultValue?: string;
-  componentType?: "input" | "textarea" | "select" | "file";
+  componentType?: "input" | "textarea" | "select" | "file" | "richText";
   selectOptions?: string[];
   className?: string;
 }
@@ -66,8 +68,25 @@ const FormFieldWrapper: FC<FormFieldWrapperProps> = ({
           </Select>
         );
 
+      case "richText":
+        return (
+          <CKEditor
+            editor={ClassicEditor}
+            config={{
+              plugins: [Essentials, Bold, Italic, Paragraph],
+              toolbar: ["undo", "redo", "|", "bold", "italic"],
+            }}
+            data={field.value}
+            onChange={(_, editor) => {
+              const data = editor.getData();
+              field.onChange(data);
+            }}
+          />
+        );
+
       case "file":
         return <Input type="file" className="cursor-pointer" {...field} />;
+
       default:
         return <Input placeholder={placeholder} {...field} />;
     }

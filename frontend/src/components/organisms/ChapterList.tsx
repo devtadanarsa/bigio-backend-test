@@ -29,9 +29,10 @@ import {
 } from "../ui/alert-dialog";
 import { BsTrash } from "react-icons/bs";
 import { useChapterStore } from "@/store/chapterStore";
-import axios from "axios";
 import { Chapter } from "@/lib/types";
 import { useToast } from "../ui/use-toast";
+import { Link } from "react-router-dom";
+import { apiClient } from "@/lib/utils";
 
 interface ChapterListProps {
   chapters:
@@ -53,7 +54,9 @@ const ChapterList: FC<ChapterListProps> = ({
 
   const handleDeleteChapter = async (chapter: Chapter) => {
     try {
-      await axios.delete(`/stories/${chapter.storyId}/chapters/${chapter.id}`);
+      await apiClient.delete(
+        `/stories/${chapter.storyId}/chapters/${chapter.id}`
+      );
       toast({
         title: "Chapter deleted successfully",
         description: "The chapter has been deleted successfully.",
@@ -98,10 +101,15 @@ const ChapterList: FC<ChapterListProps> = ({
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="space-y-2 py-3">
-                  <div className="flex mx-1 items-center text-sm hover:underline">
+                  <Link
+                    to={`/stories/${(chapter as Chapter).storyId}/chapters/${
+                      (chapter as Chapter).id
+                    }/edit`}
+                    className="flex mx-1 items-center text-sm hover:underline"
+                  >
                     <FiEdit3 />
                     <span className="ml-2">Edit Chapter</span>
-                  </div>
+                  </Link>
 
                   <AlertDialog>
                     <AlertDialogTrigger className="flex mx-1 items-center text-sm text-red-500 hover:underline">

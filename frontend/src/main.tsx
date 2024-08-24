@@ -7,6 +7,7 @@ import StoryListPage from "./pages/stories/StoryListPage.tsx";
 import AddStoryPage from "./pages/stories/AddStoryPage.tsx";
 import AddChapterPage from "./pages/chapters/AddChapterPage.tsx";
 import EditStoryPage from "./pages/stories/EditStoryPage.tsx";
+import EditChapterPage from "./pages/chapters/EditChapterPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/chapters/add",
     element: <AddChapterPage />,
+  },
+  {
+    path: `/stories/:id/chapters/:chapterId/edit`,
+    element: <EditChapterPage />,
   },
 ]);
 

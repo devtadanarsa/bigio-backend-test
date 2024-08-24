@@ -44,7 +44,7 @@ const getChapter = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Chapter not found" });
     }
 
-    res.status(200).json({ chapter });
+    res.status(200).json(chapter);
   } catch (error) {
     handleError(error, res);
   }
@@ -89,7 +89,7 @@ const createChapter = async (req: Request, res: Response) => {
  */
 const updateChapter = async (req: Request, res: Response) => {
   const { chapterId } = req.params;
-  const validatedContent = chapterSchema.parse(req.body);
+  const validatedContent = oneChapterSchema.parse(req.body);
 
   try {
     const chapter = await prisma.chapter.update({
@@ -97,8 +97,8 @@ const updateChapter = async (req: Request, res: Response) => {
         id: parseInt(chapterId),
       },
       data: {
-        title: validatedContent[0].title,
-        content: validatedContent[0].content,
+        title: validatedContent.title,
+        content: validatedContent.content,
       },
     });
     res.status(200).json({ chapter });
